@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"kms-keyring","Source":"../module","Dir":"../module"},{"Key":"project-services","Source":"../../project-services/module","Dir":"../../project-services/module"},{"Key":"kms-keyring.project-services","Source":"../../project-services/module","Dir":"../../project-services/module"},{"Key":"","Source":"","Dir":"."}]}

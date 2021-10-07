@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"project-services","Source":"../../project-services/module","Dir":"../../project-services/module"},{"Key":"bucket","Source":"../module","Dir":"../module"},{"Key":"","Source":"","Dir":"."},{"Key":"cloudsql","Source":"../module","Dir":"../module"},{"Key":"cloud_storage","Source":"../module","Dir":"../module"}]}
