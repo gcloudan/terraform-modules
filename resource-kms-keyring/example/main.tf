@@ -12,19 +12,13 @@ module "kms-keyring" {
   project_id = var.project_id
   region     = var.region
 
-  type       = "notebook"
+  type = "notebook"
 
-  set_encrypters_decrypters_for = [
-    "notebook"
-  ]
-  encrypters_decrypters = [
-    "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au"
-  ]
+  set_encrypters_decrypters_for = "notebook"
 
-  set_owners_for = [
-    "notebook"
-  ]
-  owners = [
-    "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au"
-  ]
+  encrypters_decrypters = "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au"
+
+  set_owners_for = "notebook"
+
+  owners = "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au"
 }
