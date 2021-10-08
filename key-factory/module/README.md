@@ -58,8 +58,8 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_id"></a> [id](#output\_id) | n/a |
+| <a name="output_id"></a> [id](#output\_id) | ID of Keyring. |
 | <a name="output_keys"></a> [keys](#output\_keys) | Map of key name => key self link. |
-| <a name="output_name"></a> [name](#output\_name) | n/a |
-| <a name="output_self_link"></a> [self\_link](#output\_self\_link) | n/a |
+| <a name="output_name"></a> [name](#output\_name) | Name of Keyring. |
+| <a name="output_self_link"></a> [self\_link](#output\_self\_link) | Self\_link of Keyring. |
 <!-- END_TF_DOCS -->
