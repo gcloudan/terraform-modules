@@ -1,3 +1,9 @@
+The following is generated with:
+```
+terraform-docs markdown table --output-file ../README.md --output-mode inject key-factory/module
+```
+# BEGIN_TF_DOCS
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
