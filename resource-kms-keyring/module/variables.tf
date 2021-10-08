@@ -13,31 +13,31 @@ variable "project_id" {
 }
 variable "type" {
   validation {
-    condition     = contains(["gcs", "bigquery", "cloudsql", "disk", "pubsub", "notebook"], var.type)
-    error_message = "Error: Please seleect valid options from gcs, bigquery, cloudsql, disk, pubsub, notebook."
+    condition     = contains(["gcs", "bigquery", "cloudsql", "disk", "pubsub", "notebook", "ai"], var.type)
+    error_message = "Error: Please seleect valid options from gcs, bigquery, cloudsql, disk, pubsub, notebook. ai."
   }
 }
 
 variable "set_owners_for" {
   description = "Name of keyrings for which owners will be set."
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
 }
 
 variable "owners" {
   description = "List of comma-separated owners for each keyring declared in set_owners_for."
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = "[]"
 }
 
 variable "encrypters_decrypters" {
   description = "List of comma-separated owners for each keyring declared in set_encrypters_decrypters_for."
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
 }
 
 variable "set_encrypters_decrypters_for" {
   description = "Name of keyrings for which the encrypter/decrypters role will be set."
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
 }

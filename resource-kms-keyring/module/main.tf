@@ -20,15 +20,13 @@ resource "null_resource" "message" {
 }
 
 resource "google_kms_key_ring_iam_binding" "owners" {
-  count         = length(var.set_owners_for)
   role          = "roles/owner"
-  key_ring_id = data.google_kms_key_ring.existing_keyring.self_link == null ? join("", google_kms_key_ring.keyring.*.id) : data.google_kms_key_ring.existing_keyring.self_link
-  members       = compact(split(",", var.owners[count.index]))
+  key_ring_id   = data.google_kms_key_ring.existing_keyring.self_link == null ? join("", google_kms_key_ring.keyring.*.id) : data.google_kms_key_ring.existing_keyring.self_link
+  members       = compact(split(",", var.owners))
 }
 
 resource "google_kms_key_ring_iam_binding" "encrypters_decrypters" {
-  count         = length(var.set_encrypters_decrypters_for)
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  key_ring_id = data.google_kms_key_ring.existing_keyring.self_link == null ? join("", google_kms_key_ring.keyring.*.id) : data.google_kms_key_ring.existing_keyring.self_link
-  members       = compact(split(",", var.encrypters_decrypters[count.index]))
+  key_ring_id   = data.google_kms_key_ring.existing_keyring.self_link == null ? join("", google_kms_key_ring.keyring.*.id) : data.google_kms_key_ring.existing_keyring.self_link
+  members       = compact(split(",", var.encrypters_decrypters))
 }
