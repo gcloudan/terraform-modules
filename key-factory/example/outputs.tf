@@ -13,3 +13,7 @@ output "keyring_name" {
 output "keys_self_link" {
   value = module.kms-keyring.keys
 }
+
+output "first_key_self_link" {
+  value = module.kms-keyring.first_key_self_link
+}

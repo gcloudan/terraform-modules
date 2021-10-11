@@ -23,3 +23,8 @@ output "keys" {
     google_kms_crypto_key_iam_binding.keys_encrypters_decrypters
   ]
 }
+
+output "first_key_self_link" {
+  description = "First key self link."
+  value       = google_kms_crypto_key.key[0].self_link
+}

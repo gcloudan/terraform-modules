@@ -77,6 +77,7 @@ variable "backup_configuration" {
   })
   default = {
     enabled                        = true
+    binary_log_enabled             = false
     start_time                     = null
     location                       = null
     point_in_time_recovery_enabled = false
@@ -176,7 +177,8 @@ variable "additional_databases" {
     charset   = string
     collation = string
   }))
-  default = []
+  default = [
+  ]
 }
 
 variable "additional_users" {

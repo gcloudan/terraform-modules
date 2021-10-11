@@ -1,3 +1,25 @@
+Adding IAM users to cloud sql is a bit painful. Terraform has a google_service_account resource which gives easy access to the user's email. Unfortunately, IAM users need a stripped version of user email - per the docs:
+
+This is postgres, user creation will not work 
+// HA method using REGIONAL availability_type requires binary logs to be enabled
+
+
+
+## Tests
+
+1. PASS: Create 1 database instance with 0 database
+1. PASS: Create 1 database instance with 1 database
+1. PASS: Create 1 database instance with 0 database with CMEK
+
+1. PASS: Create 1 database instance with 1 database with CMEK with no roles
+1. PASS: Create 1 database instance with 1 database with CMEK with roles
+
+1. PASS: Create 1 database instance with 2 database with CMEK with no roles
+1. PASS: Create 1 database instance with 2 database with CMEK with roles
+
+1. PASS: Create 1 mysql database instance with 2 database with CMEK with roles
+1. Create a database instance with a read replica with the same CMEK and with roles
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

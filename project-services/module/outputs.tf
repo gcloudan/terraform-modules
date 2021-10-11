@@ -12,3 +12,7 @@ output "enabled_api_identities" {
   description = "Enabled API identities in the project"
   value       = { for i in google_project_service_identity.project_service_identities : i.service => i.email }
 }
+
+output "project_number" {
+  value = data.google_project.current_project.number
+}
