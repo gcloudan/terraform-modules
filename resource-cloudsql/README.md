@@ -1,9 +1,267 @@
-Adding IAM users to cloud sql is a bit painful. Terraform has a google_service_account resource which gives easy access to the user's email. Unfortunately, IAM users need a stripped version of user email - per the docs:
+# Resource Cloud SQL
+To make better use of this module, check the [Usage](#Usage) section.
 
-This is postgres, user creation will not work 
-// HA method using REGIONAL availability_type requires binary logs to be enabled
+## Prerequisites
+---
 
+### Installation Dependencies
 
+- Terraform version 0.13.x or above
+
+### Configure a Service Account
+In order to execute this module you must have a Service Account with the following:
+
+#### Roles
+
+- Cloud SQL Admin: `roles/cloudsql.admin`
+- Compute Network Admin: `roles/compute.networkAdmin`
+- Cloud KMS Admin: `roles/cloudkms.admin`
+- (Optional) Service Account roles: `role/iamserviceAccountCreator` or `roles/iam.serviceAccountAdmin`
+
+### Enable APIs
+
+In order to operate with the Service Account you must activate the following APIs on the project where the Service Account was created:
+
+- Cloud SQL Admin API: `sqladmin.googleapis.com`
+
+In order to use Private Service Access, required for using Private IPs, you must activate
+the following APIs on the project where your VPC resides:
+
+- Cloud SQL Admin API: `sqladmin.googleapis.com`
+- Compute Engine API: `compute.googleapis.com`
+- Service Networking API: `servicenetworking.googleapis.com`
+- SQL Component API: `sql-component.googleapis.com`
+- Cloud KMS API: `cloudkms.googleapis.com`
+- Cloud Resource Manager API: `cloudresourcemanager.googleapis.com`
+
+## Changelog
+---
+[1.0.0] - 2021-08-24
+---
+* First versioned release of the module
+* First Codefresh pipeline
+
+[1.0.1] - 2021-09-22
+---
+* Fixed an issue in the module after Codefresh migration
+* Added a random suffix for creating a Service Account in the example
+
+### Usage
+
+For PostgreSQL with:
+- CMEK Keyring and Key creation
+```
+module "kms" {
+  source  = "internal/cloudsql/repo//"
+  source     = "../../key-factory/module"
+  
+  project_id = var.project_id
+  region     = var.region
+  env        = var.env
+
+  # Keyring
+  type = "cloudsql"
+
+  set_encrypters_decrypters_for_keyring = true
+  encrypters_decrypters                 = "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"
+
+  # Keys
+  keys = [
+    "high-availability-postgres"
+  ]
+
+  set_keys_encrypters_decrypters_for = ["high-availability-postgres"]
+  keys_encrypters_decrypters         = ["user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au,serviceAccount:service-${module.project-services.project_number}@gcp-sa-cloud-sql.iam.gserviceaccount.com"]
+
+  set_keys_owners_for = []
+  keys_owners         = []
+}
+
+module "cloudsql" {
+  source           = "../module"
+  name             = var.db_name
+  database_version = var.database_version
+  project_id       = var.project_id
+  zone             = var.zone
+  region           = var.region
+  tier             = var.tier
+  env              = var.env
+
+  deletion_protection = var.deletion_protection
+
+  ip_configuration = var.ip_configuration
+
+  database_flags = var.database_flags
+
+  encryption_key_name = module.kms-keyring.first_key_self_link
+}
+
+module "project-services" {
+  source        = "../../project-services/module"
+  project_id    = var.project_id
+  activate_apis = var.activate_apis
+
+  disable_services_on_destroy = false
+  disable_dependent_services  = false
+  }
+}
+```
+
+For PostgreSQL with:
+
+- CMEK Keyring and Key creation
+- Database creation
+- Service Agent creation with roles:
+  - `roles/cloudkms.cryptoKeyEncrypterDecrypter`
+  - `roles/cloudsql.serviceAgent`
+  - `roles/cloudsql.instanceUser`
+```hcl
+module "kms" {
+  source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
+  source     = "../../key-factory/module"
+  
+  project_id = var.project_id
+  region     = var.region
+  env        = var.env
+
+  # Keyring
+  type = "cloudsql"
+
+  set_encrypters_decrypters_for_keyring = true
+  encrypters_decrypters                 = "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"
+
+  # Keys
+  keys = [
+    "high-availability-postgres"
+  ]
+
+  set_keys_encrypters_decrypters_for = ["high-availability-postgres"]
+  keys_encrypters_decrypters         = ["user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au,serviceAccount:service-${module.project-services.project_number}@gcp-sa-cloud-sql.iam.gserviceaccount.com"]
+
+  set_keys_owners_for = []
+  keys_owners         = []
+}
+
+module "cloudsql" {
+  source           = "../module"
+  name             = var.db_name
+  database_version = var.database_version
+  project_id       = var.project_id
+  zone             = var.zone
+  region           = var.region
+  tier             = var.tier
+  env              = var.env
+
+  deletion_protection = var.deletion_protection
+
+  ip_configuration = var.ip_configuration
+
+  database_flags = var.database_flags
+
+  additional_users = var.additional_users
+
+  # Supports creation of both IAM Users and IAM Service Accounts with provided emails
+  iam_user_emails = [
+    "service-${module.project-services.project_number}@gcp-sa-cloud-sql.iam.gserviceaccount.com"
+  ]
+
+  encryption_key_name = module.kms-keyring.first_key_self_link
+
+  additional_databases = [{
+    name      = "db1"
+    charset   = "",
+    collation = ""
+  }]
+}
+
+module "project-services" {
+  source        = "../../project-services/module"
+  project_id    = var.project_id
+  activate_apis = var.activate_apis
+  activate_api_identities = [
+    { api   = "sqladmin.googleapis.com"
+      roles = ["roles/cloudsql.serviceAgent"]
+    }
+  ]
+
+  disable_services_on_destroy = false
+  disable_dependent_services  = false
+  }
+}
+```
+
+For MySQL with:
+
+- CMEK Keyring and Key creation
+
+```hcl
+module "kms" {
+  source  = "GoogleCloudPlatform/sql-db/google//modules/mysql"
+  source     = "../../key-factory/module"
+  
+  project_id = var.project_id
+  region     = var.region
+  env        = var.env
+
+  # Keyring
+  type = "cloudsql"
+
+  set_encrypters_decrypters_for_keyring = true
+  encrypters_decrypters                 = "serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"
+
+  # Keys
+  keys = [
+    "high-availability-postgres"
+  ]
+
+  set_keys_encrypters_decrypters_for = ["high-availability-postgres"]
+  keys_encrypters_decrypters         = ["user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au,serviceAccount:service-${module.project-services.project_number}@gcp-sa-cloud-sql.iam.gserviceaccount.com"]
+
+  set_keys_owners_for = []
+  keys_owners         = []
+}
+
+module "mysql" {
+  source           = "../module"
+  name             = var.db_name
+  database_version = "MYSQL_8_0"
+  project_id       = var.project_id
+  zone             = var.zone
+  region           = var.region
+  tier             = var.tier
+  env              = var.env
+
+  deletion_protection = var.deletion_protection
+
+  ip_configuration = {
+    enabled                        = true
+    binary_log_enabled             = true # HA method using REGIONAL availability_type requires binary logs to be enabled
+    start_time                     = null
+    location                       = null
+    point_in_time_recovery_enabled = false
+    transaction_log_retention_days = null
+    retained_backups               = null
+    retention_unit                 = null
+  }
+
+  encryption_key_name = module.kms-keyring.first_key_self_link
+}
+
+module "project-services" {
+  source        = "../../project-services/module"
+  project_id    = var.project_id
+  activate_apis = var.activate_apis
+  activate_api_identities = [
+    { api   = "sqladmin.googleapis.com"
+      roles = ["roles/cloudsql.serviceAgent"]
+    }
+  ]
+
+  disable_services_on_destroy = false
+  disable_dependent_services  = false
+  }
+}
+```
 
 ## Tests
 
@@ -106,3 +364,7 @@ No modules.
 | <a name="output_project_id"></a> [project\_id](#output\_project\_id) | n/a |
 | <a name="output_public_ip_address"></a> [public\_ip\_address](#output\_public\_ip\_address) | The first public (PRIMARY) IPv4 address assigned for the master instance |
 <!-- END_TF_DOCS -->
+
+## Contributing
+
+Refer to the [contribution guidelines](../README.md) for information on contributing to this module.
