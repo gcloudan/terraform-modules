@@ -26,17 +26,17 @@ resource "null_resource" "message" {
 }
 
 resource "google_kms_key_ring_iam_binding" "owners" {
-  count         = var.set_owners_for_keyring ? 1 : 0
-  role          = "roles/owner"
-  key_ring_id   = data.google_kms_key_ring.existing_keyring.self_link == null ? google_kms_key_ring.keyring[0].id : data.google_kms_key_ring.existing_keyring.self_link
-  members       = compact(split(",", var.owners))
+  count       = var.set_owners_for_keyring ? 1 : 0
+  role        = "roles/owner"
+  key_ring_id = data.google_kms_key_ring.existing_keyring.self_link == null ? google_kms_key_ring.keyring[0].id : data.google_kms_key_ring.existing_keyring.self_link
+  members     = compact(split(",", var.owners))
 }
 
 resource "google_kms_key_ring_iam_binding" "encrypters_decrypters" {
-  count         = var.set_encrypters_decrypters_for_keyring ? 1 : 0
-  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  key_ring_id   = data.google_kms_key_ring.existing_keyring.self_link == null ? google_kms_key_ring.keyring[0].id : data.google_kms_key_ring.existing_keyring.self_link
-  members       = compact(split(",", var.encrypters_decrypters))
+  count       = var.set_encrypters_decrypters_for_keyring ? 1 : 0
+  role        = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  key_ring_id = data.google_kms_key_ring.existing_keyring.self_link == null ? google_kms_key_ring.keyring[0].id : data.google_kms_key_ring.existing_keyring.self_link
+  members     = compact(split(",", var.encrypters_decrypters))
 }
 
 

@@ -19,10 +19,10 @@ module "kms-keyring" {
   ]
 
   set_keys_encrypters_decrypters_for = ["key1"]
-  keys_encrypters_decrypters = ["serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"]
+  keys_encrypters_decrypters         = ["serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"]
 
   set_keys_owners_for = ["key1"]
-  keys_owners = ["serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"]
+  keys_owners         = ["serviceAccount:service-${data.google_project.current_project.number}@compute-system.iam.gserviceaccount.com,user:samuel.lin@kasna.com.au,user:danny.tran@kasna.com.au"]
 }
 
 module "project-services" {

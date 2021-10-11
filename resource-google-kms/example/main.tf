@@ -4,7 +4,7 @@ module "key" {
   region     = var.region
   project_id = var.project_id
   env        = var.env
-  suffix = var.suffix
+  suffix     = var.suffix
 
   key_ring_name = "disk_keyring"
 
@@ -24,5 +24,5 @@ module "key" {
   ]
 
   set_owners_for = []
-  owners = []
+  owners         = []
 }

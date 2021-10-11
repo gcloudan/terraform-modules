@@ -118,6 +118,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_first_key_self_link"></a> [first\_key\_self\_link](#output\_first\_key\_self\_link) | First key self link. |
 | <a name="output_id"></a> [id](#output\_id) | ID of Keyring. |
 | <a name="output_keys"></a> [keys](#output\_keys) | Map of key name => key self link. |
 | <a name="output_name"></a> [name](#output\_name) | Name of Keyring. |
