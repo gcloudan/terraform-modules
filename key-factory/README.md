@@ -54,6 +54,9 @@ The following is generated with:
 ```
 terraform-docs markdown table --output-file ../README.md --output-mode inject key-factory/module
 ```
+
+
+Replaces [resource-kms-key](../resource-kms-key/) and [resource-kms-keyring](../resource-kms-keyring/)
 # BEGIN_TF_DOCS
 
 <!-- BEGIN_TF_DOCS -->
